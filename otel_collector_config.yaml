@@ -1,0 +1,14 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+exporters:
+  otlphttp:
+    endpoint: "${DT_OTLPHTTP_ENDPOINT}"
+    headers: {"Authorization": "Api-Token ${DT_API_TOKEN}"}
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]

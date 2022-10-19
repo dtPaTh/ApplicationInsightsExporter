@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.15.4" />
+		<PackageReference Include="Google.Protobuf.Tools" Version="3.15.4" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="System.Text.Json" Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="messages\" />
+		<Folder Include="proto\" />
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="$(NugetPackageRoot)google.protobuf.tools\3.17.2\tools\windows_x86\protoc.exe -I=$(ProjectDir)proto --csharp_out=$(ProjectDir)Messages $(ProjectDir)proto\opentelemetry\proto\collector\trace\v1\trace_service.proto&#xD;&#xA;$(NugetPackageRoot)google.protobuf.tools\3.17.2\tools\windows_x86\protoc.exe -I=$(ProjectDir)proto --csharp_out=$(ProjectDir)Messages $(ProjectDir)proto\opentelemetry\proto\common\v1\common.proto&#xD;&#xA;$(NugetPackageRoot)google.protobuf.tools\3.17.2\tools\windows_x86\protoc.exe -I=$(ProjectDir)proto --csharp_out=$(ProjectDir)Messages $(ProjectDir)proto\opentelemetry\proto\resource\v1\resource.proto&#xD;&#xA;$(NugetPackageRoot)google.protobuf.tools\3.17.2\tools\windows_x86\protoc.exe -I=$(ProjectDir)proto --csharp_out=$(ProjectDir)Messages $(ProjectDir)proto\opentelemetry\proto\trace\v1\trace.proto" />
+	</Target>
+
+</Project>
