@@ -1,6 +1,6 @@
 # Application Insights Exporter for OpenTelemetry
 
-The Application Insights Exporter allows to read traces exported from Application Insights via Azure EventHub and converts/forwards to an OpenTelemetry OTLP compatible endpoint. 
+The Application Insights Exporter allows to read traces exported from Azure Application Insights via Azure EventHub and converts/forwards to an OpenTelemetry OTLP compatible endpoint. 
 
 ## How does it work?
 The project provides an Azure Function, bound to an EventHub from which it receives, converts and forwards the telemetry. 
@@ -39,7 +39,7 @@ Configure Diagnostic settings of your Application Insights instance from which y
 }
 ```
 * Replace the value of **EHConnection** with the connection string to read from your configured eventhub. Read more about here, [how to get an Event Hubs connection string](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string)
-* Configure the **OTLP_ENDPOING** to point to your targeted OLTP/HTTP JSON compatible endpoint. By default it's an local endpoint configured for testing. 
+* Configure the **OTLP_ENDPOINT* to point to your targeted OLTP/HTTP JSON compatible endpoint. By default it's an local endpoint configured for testing. 
 
 2. Run your Function
 
@@ -77,7 +77,7 @@ Linux
 docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -e API_TOKEN="<Your-api-token>" -v $(pwd)/otel_collector_config.yaml:/etc/otel/config.yaml otel/opentelemetry-collector-contrib
 ```
 
-**Note**: Replace *<Your-receiving-OTLP-endpoint>* and *<Your-api-token>* with the values matching your trace backends configuration
+**Note**: Replace *&lt;Your-receiving-OTLP-endpoint&gt;* and *&lgt;Your-api-token&gt;* with the values matching your trace backend's configuration
 
 ### Original Trace in Application Insights
 ![](ai-trace.png)

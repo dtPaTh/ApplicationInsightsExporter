@@ -35,11 +35,6 @@ namespace ApplicationInsightsForwarder
                     if (exportTraceServiceRequest == null) // if format was not able to be processed/mapped.. 
                         continue;
 
-                    var httpClientHandler = new HttpClientHandler();
-                    httpClientHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-                    
-                    var client = new HttpClient(httpClientHandler);
-                    
                     var otlpJson = _converter.AsJson(exportTraceServiceRequest);
 
                     var content = new StringContent(otlpJson, System.Text.Encoding.UTF8, "application/json");
