@@ -10,13 +10,13 @@ Supported [Application Insights telemetry types](https://learn.microsoft.com/en-
 * AppRequests
 
 Supported OpenTelemetry formats are: 
-* [OTLP/HTTP JSON format](https://opentelemetry.io/docs/reference/specification/protocol/otlp/#otlphttp)
+* [OTLP/HTTP binary format](https://opentelemetry.io/docs/reference/specification/protocol/otlp/#binary-protobuf-encoding)
 
 ## Getting Started
 
 ### Pre-Requisites
 * Create or configure an Azure EventHub with the name "appinsights" to which you want forward the telemetry from your Application Instance. 
-* If your target backend doesn't support OLTP/HTTP JSON format, you can use an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) as a receiving endpoint for the Application Insights Exporter. 
+* If your target backend doesn't support OLTP/HTTP binary format, you can use an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) as a receiving endpoint for the Application Insights Exporter. 
 
 ### Sending trace telemetry 
 Configure Diagnostic settings of your Application Insights instance from which you want to forward the telemtry. 
@@ -35,19 +35,20 @@ Configure Diagnostic settings of your Application Insights instance from which y
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "EHConnection": "<YourEventHubConnectionString",
     "OTLP_ENDPOINT": "http://localhost:4318/v1/traces"
+    /*,"OTLP_HEADER_AUTHORIZATION": "<YOUR-AUTHORIZATION-HEADER-VALUE>"*/
   }
 }
 ```
-* Replace the value of **EHConnection** with the connection string to read from your configured eventhub. Read more about here, [how to get an Event Hubs connection string](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string)
-* Configure the **OTLP_ENDPOINT* to point to your targeted OLTP/HTTP JSON compatible endpoint. By default it's an local endpoint configured for testing. 
+* Replace the value of **EHConnection** with the connection string to read from your configured eventhub. Read more about here, [how to get an Event Hub connection string](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string)
+* Configure the **OTLP_ENDPOINT* to point to your targeted OLTP/HTTP binary compatible endpoint. By default it's an local endpoint configured for testing. 
+* Optionally configure **OTLP_HEADER_AUTHORIZATION**. If your OTLP endpoint requires authentication, you can set the **Authorization** http-header with this setting. 
 
 2. Run your Function
 
 For more details how to run an Azure Function locally see [Code and test Azure Functions locally](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-local)
 
-
 ### [Optional] Run an OpenTelemetry Collector 
-The project contains a collector config **otel_collector_config.yaml**, configured with a pipeline for an OTLP/HTTP binary format requiring an authorization token. It allows to pass the receiving OTLP endpiont and an authorization token via environment variables. 
+The project contains a collector config **otel_collector_config.yaml**, configured with a pipeline for an OTLP/HTTP format requiring an authorization token. It allows to pass the receiving OTLP endpiont and an authorization token via environment variables. 
 ```
 receivers:
   otlp:
@@ -69,12 +70,12 @@ Now run the standard OpenTelemetry collector image from Docker-Hub [otel/opentel
 
 Windows
 ```
-docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -e API_TOKEN="<Your-api-token>" -v %cd%/otel_collector_config.yaml:/etc/otel/config.yaml otel/opentelemetry-collector-contrib
+docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -e API_TOKEN="<Your-api-token>" -v %cd%/otel_collector_config.yaml:/etc/otelcol-contrib/config.yaml otel/opentelemetry-collector-contrib
 ```
 
 Linux
 ```
-docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -e API_TOKEN="<Your-api-token>" -v $(pwd)/otel_collector_config.yaml:/etc/otel/config.yaml otel/opentelemetry-collector-contrib
+docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -e API_TOKEN="<Your-api-token>" -v $(pwd)/otel_collector_config.yaml:/etc/otelcol-contrib/config.yaml otel/opentelemetry-collector-contrib
 ```
 
 **Note**: Replace *&lt;Your-receiving-OTLP-endpoint&gt;* and *&lgt;Your-api-token&gt;* with the values matching your trace backend's configuration
@@ -87,6 +88,7 @@ docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -
 
 ## Release Notes
 v0.1.0 - Initial release supporting AppDependency, AppRequests mapped and forwarded to OTLP/HTTP JSON
+v0.9.0 - Swichting from OTLP/HTTP json format to OTLP/HTTP binary format. 
 
 ## Contribute
 This is an open source project, and we gladly accept new contributions and contributors.  

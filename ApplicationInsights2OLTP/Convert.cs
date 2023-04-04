@@ -107,12 +107,13 @@ namespace ApplicationInsights2OTLP
 
         internal string ParseTraceId(string traceid)
         {
+            
 #if DEBUG
-            if (_SimulateRealtime) //generate a unique trace-id per run
-                return BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", string.Empty).ToLower();
-            else
+            if (_SimulateRealtime) //generate a unique trace-id per run 
+                traceid = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", string.Empty).ToLower();
 #endif
-                return traceid;
+
+            return traceid;
         }
 
         public ulong ConvertTimeStampToNano(string ts)
@@ -166,8 +167,6 @@ namespace ApplicationInsights2OTLP
             }
             return false;
 
-
-
         }
 
         public bool TryMapProperties(Span s, string key, string value)
@@ -192,64 +191,15 @@ namespace ApplicationInsights2OTLP
 
         internal ByteString ConvertToByteString(string str)
         {
-            var byteStr = ByteString.Empty;
-            var strBytes = Encoding.ASCII.GetBytes(str);
-            
-            byteStr = UnsafeByteOperations.UnsafeWrap(strBytes);
+            byte[] byteArray = new byte[str.Length / 2];
+            for (int i = 0; i < byteArray.Length; i++)
+            {
+                byteArray[i] = System.Convert.ToByte(str.Substring(i * 2, 2), 16);
+            }
+
+            ByteString byteStr = ByteString.CopyFrom(byteArray);
 
             return byteStr;
-        }
-
-        //As of otlp spec, sending otlp as json requires additional formatting as 
-        //traceid's encoding deviates from standard protbuf2json mapping to be sent not as base64 encoded string..             
-        public string AsJson(ExportTraceServiceRequest exportTraceServiceRequest)
-        {
-            try
-            {
-                JObject jsonObj = JObject.Parse(exportTraceServiceRequest.ToString());
-                if (jsonObj != null && jsonObj.ContainsKey(SpanConstants.ResourceSpans))
-                {
-                    foreach (JObject resSpan in jsonObj[SpanConstants.ResourceSpans])
-                    {
-                        if (resSpan.ContainsKey(SpanConstants.InstrumentationLibrarySpans))
-                        {
-                            foreach (JObject instrSpan in resSpan[SpanConstants.InstrumentationLibrarySpans])
-                            {
-                                if (instrSpan.ContainsKey(SpanConstants.Spans))
-                                {
-                                    foreach (JObject span in instrSpan[SpanConstants.Spans])
-                                    {
-                                        try
-                                        {
-                                            //as of otlp spec, traceid encoding deviates from standard spec to be sent not in base64 ..             
-                                            span[SpanConstants.TraceId] = Encoding.UTF8.GetString(System.Convert.FromBase64String((string)span[SpanConstants.TraceId]));
-                                            span[SpanConstants.SpanId] = Encoding.UTF8.GetString(System.Convert.FromBase64String((string)span[SpanConstants.SpanId]));
-                                            if (span[SpanConstants.ParentSpanId] != null)
-                                                span[SpanConstants.ParentSpanId] = Encoding.UTF8.GetString(System.Convert.FromBase64String((string)span[SpanConstants.ParentSpanId]));
-                                            
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            _logger.LogError(e, "Error converting tracecontext id's to strings to be used in json");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return jsonObj.ToString(Newtonsoft.Json.Formatting.None);
-                }
-
-            }
-            catch(Exception e)
-            {
-                _logger.LogError(e, "Error converting ExportTraceServiceRequest to Json");
-                
-            }
-
-            return "";
-
         }
 
         internal string Value(JsonElement e, string key)

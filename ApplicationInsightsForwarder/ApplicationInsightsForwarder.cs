@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
@@ -35,15 +36,26 @@ namespace ApplicationInsightsForwarder
                     if (exportTraceServiceRequest == null) // if format was not able to be processed/mapped.. 
                         continue;
 
-                    var otlpJson = _converter.AsJson(exportTraceServiceRequest);
+                    
+                    _client.DefaultRequestHeaders.Clear();
 
-                    var content = new StringContent(otlpJson, System.Text.Encoding.UTF8, "application/json");
-                    content.Headers.ContentType.CharSet = String.Empty; //if charset is set, otlp receiver rejects request!!!
+                    var authHeader = Environment.GetEnvironmentVariable("OTLP_HEADER_AUTHORIZATION");
+                    if (!String.IsNullOrEmpty(authHeader))
+                        _client.DefaultRequestHeaders.Add("Authorization", authHeader); 
 
-                    var res = await _client.PostAsync(Environment.GetEnvironmentVariable("OTLP_ENDPOINT"), content);
+                    var otlpEndpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
+                    if (!otlpEndpoint.Contains("v1/traces"))
+                        if (otlpEndpoint.EndsWith("/"))
+                            otlpEndpoint = otlpEndpoint+="v1/traces";
+                        else
+                            otlpEndpoint = otlpEndpoint += "/v1/traces";
+
+                    var content = new ApplicationInsights2OTLP.ExportRequestContent(exportTraceServiceRequest);
+
+                    var res = await _client.PostAsync(otlpEndpoint, content);
                     if (!res.IsSuccessStatusCode)
                     {
-                        log.LogError("Couldn't send span "+(res.StatusCode)+"\n" + messageBody+"\n"+ otlpJson);
+                        log.LogError("Couldn't send span " + (res.StatusCode) + "\n" + messageBody );
                     }
 
                     await Task.Yield();
