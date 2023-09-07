@@ -17,7 +17,7 @@ namespace ApplicationInsightsForwarder
         ApplicationInsights2OTLP.Convert _converter;
         public ApplicationInsightsForwarder(IHttpClientFactory httpClientFactory, ApplicationInsights2OTLP.Convert otlpConverter)
         {
-            _client = httpClientFactory.CreateClient();
+            _client = httpClientFactory.CreateClient("ApplicationInsightsExporter");
             _converter = otlpConverter;
         }
 
