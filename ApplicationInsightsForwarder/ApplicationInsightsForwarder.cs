@@ -14,11 +14,22 @@ namespace ApplicationInsightsForwarder
     public class ApplicationInsightsForwarder
     {
         HttpClient _client;
+        string _otlpEndpoint;
         ApplicationInsights2OTLP.Convert _converter;
+        
         public ApplicationInsightsForwarder(IHttpClientFactory httpClientFactory, ApplicationInsights2OTLP.Convert otlpConverter)
         {
-            _client = httpClientFactory.CreateClient("ApplicationInsightsExporter");
             _converter = otlpConverter;
+
+            _client = httpClientFactory.CreateClient("ApplicationInsightsExporter");
+
+            _otlpEndpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
+            if (!_otlpEndpoint.Contains("v1/traces"))
+                if (_otlpEndpoint.EndsWith("/"))
+                    _otlpEndpoint = _otlpEndpoint += "v1/traces";
+                else
+                    _otlpEndpoint = _otlpEndpoint += "/v1/traces";
+            
         }
 
         [FunctionName("ForwardAI")]
@@ -36,23 +47,9 @@ namespace ApplicationInsightsForwarder
                     if (exportTraceServiceRequest == null) // if format was not able to be processed/mapped.. 
                         continue;
 
-                    
-                    _client.DefaultRequestHeaders.Clear();
-
-                    var authHeader = Environment.GetEnvironmentVariable("OTLP_HEADER_AUTHORIZATION");
-                    if (!String.IsNullOrEmpty(authHeader))
-                        _client.DefaultRequestHeaders.Add("Authorization", authHeader); 
-
-                    var otlpEndpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
-                    if (!otlpEndpoint.Contains("v1/traces"))
-                        if (otlpEndpoint.EndsWith("/"))
-                            otlpEndpoint = otlpEndpoint+="v1/traces";
-                        else
-                            otlpEndpoint = otlpEndpoint += "/v1/traces";
-
                     var content = new ApplicationInsights2OTLP.ExportRequestContent(exportTraceServiceRequest);
 
-                    var res = await _client.PostAsync(otlpEndpoint, content);
+                    var res = await _client.PostAsync(_otlpEndpoint, content);
                     if (!res.IsSuccessStatusCode)
                     {
                         log.LogError("Couldn't send span " + (res.StatusCode) + "\n" + messageBody );
@@ -69,7 +66,6 @@ namespace ApplicationInsightsForwarder
             }
 
             // Once processing of the batch is complete, if any messages in the batch failed processing throw an exception so that there is a record of the failure.
-
             if (exceptions.Count > 1)
                 throw new AggregateException(exceptions);
 
