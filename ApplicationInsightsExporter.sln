@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationInsightsForwarde
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationInsights2OLTP", "ApplicationInsights2OLTP\ApplicationInsights2OLTP.csproj", "{4F41F104-8FED-40B4-B372-75788F82F592}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationInsightsTest", "ApplicationInsightsTest\ApplicationInsightsTest.csproj", "{4C583C68-D6DC-4233-AD6D-076BDC72E20D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2B32C782-BED1-45F7-8FF6-8919C2307D78}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
@@ -30,10 +28,6 @@ Global
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C583C68-D6DC-4233-AD6D-076BDC72E20D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C583C68-D6DC-4233-AD6D-076BDC72E20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C583C68-D6DC-4233-AD6D-076BDC72E20D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C583C68-D6DC-4233-AD6D-076BDC72E20D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
