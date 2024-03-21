@@ -26,5 +26,6 @@ namespace ApplicationInsights
         public const string ResultCode = "ResultCode";
         public const string SDKVersion = "SDKVersion";
         public const string Target = "Target";
+        public const string Source = "Source";
     }
 }

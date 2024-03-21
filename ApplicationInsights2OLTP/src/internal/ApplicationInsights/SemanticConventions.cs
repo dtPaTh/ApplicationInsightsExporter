@@ -11,11 +11,15 @@ namespace ApplicationInsights
         public const string ScopeAppInsights = "appinsights";
         public const string ScopeProperties = "prop";
 
+        public const string TelemetryType = ScopeAppInsights + ".type";
         public const string DependencyType = ScopeAppInsights+".dependencytype";
+        public const string OperationName = ScopeAppInsights + ".operationname";
         public const string Name = ScopeAppInsights + ".name";
         public const string Url = ScopeAppInsights + ".url";
         public const string Status = ScopeAppInsights + ".status";
         public const string Data = ScopeAppInsights + ".data";
+        public const string Source = ScopeAppInsights + ".source";
+        public const string Target = ScopeAppInsights + ".target";
         public const string ResultCode = ScopeAppInsights + ".resultcode";
 
         

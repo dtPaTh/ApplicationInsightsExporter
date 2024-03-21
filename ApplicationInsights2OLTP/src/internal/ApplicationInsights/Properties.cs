@@ -12,5 +12,6 @@ namespace ApplicationInsights
         public const string LogLevel = "LogLevel";
         public const string Category = "Category";
         public const string OperationName = "OperationName";
+        public const string OriginalFormat = "{OriginalFormat}";
     }
 }

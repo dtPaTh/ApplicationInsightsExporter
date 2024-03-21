@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static Opentelemetry.Proto.Trace.V1.Span.Types;
 
 namespace OpenTelemetry
 {
@@ -146,5 +147,16 @@ namespace OpenTelemetry
         public const string AttributeExceptionType = "exception.type";
         public const string AttributeExceptionMessage = "exception.message";
         public const string AttributeExceptionStacktrace = "exception.stacktrace";
+
+
+
+        public const string MessagingOperationCreate = "create";
+        public const string MessagingOperationPublish = "publish";
+        public const string MessagingOperationDeliver = "deliver";
+        public const string MessagingOperationReceive = "receive";
+
+        public const string MessagingSystemAzureEventGrid = "azure_eventgrid";
+        public const string MessagingSystemAzureEventHubs = "azure_eventhubs";
+        public const string MessagingSystemAzureServiceBus = "azure_servicebus";
     }
 }
