@@ -2,6 +2,12 @@
 
 The Application Insights Exporter allows to read traces exported from Azure Application Insights and send it to an OpenTelemetry OTLP compatible endpoint. 
 
+### Original Trace in Application Insights
+![](ai-trace.png)
+
+### Exported Trace in Dynatrace
+![](dt-trace.png)
+
 ## How does it work?
 The project comes with an Azure Function, bound to an EventHub from which it receives and then converts and forwards the telemetry. 
 
@@ -124,12 +130,6 @@ docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -
 ```
 
 **Note**: Replace *&lt;Your-receiving-OTLP-endpoint&gt;* and *&lt;Your-api-token&gt;* with the values matching your trace backend's configuration
-
-### Original Trace in Application Insights
-![](ai-trace.png)
-
-### Exported Trace in Dynatrace
-![](dt-trace.png)
 
 ## Release Notes
 * v0.1.0 - Initial release supporting AppDependency, AppRequests mapped and forwarded to OTLP/HTTP JSON
