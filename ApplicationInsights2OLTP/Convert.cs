@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using AISemConv = ApplicationInsights.SemanticConventions;
 using OTelSemConv = OpenTelemetry.SemanticConventions;
 using System.ComponentModel.Design;
+using System.Text.RegularExpressions;
 
 namespace ApplicationInsights2OTLP
 {
@@ -26,6 +27,9 @@ namespace ApplicationInsights2OTLP
         private readonly ILogger _logger;
 
         public readonly bool _SimulateRealtime = false;
+
+        private static readonly Regex TraceIdRegex = new Regex("^[a-fA-F0-9]{32}$", RegexOptions.Compiled);
+
 
         public Convert(ILoggerFactory? loggerFactory)
         {
@@ -98,15 +102,28 @@ namespace ApplicationInsights2OTLP
                 return DateTimeOffset.Parse(ts);
         }
 
+        public static bool IsValidTraceId(string traceId)
+        {
+            if (string.IsNullOrEmpty(traceId))
+            {
+                return false;
+            }
+
+            return TraceIdRegex.IsMatch(traceId);
+        }
+
         internal string ParseTraceId(string traceid)
         {
-            
+
 #if DEBUG
             if (_SimulateRealtime) //generate a unique trace-id per run 
                 traceid = BitConverter.ToString(Guid.NewGuid().ToByteArray()).Replace("-", string.Empty).ToLower();
 #endif
-
+            if (!IsValidTraceId(traceid))
+                traceid = string.Empty;
+                
             return traceid;
+            
         }
 
         public ulong ConvertTimeStampToNano(string ts)
@@ -228,10 +245,11 @@ namespace ApplicationInsights2OTLP
             var t = root.RootElement.GetProperty(TelemetryConstants.Records).EnumerateArray();
             while (t.MoveNext())
             {
-                var traceId = ParseTraceId(Value(t.Current, Attributes.OperationId));
+                var operationId = Value(t.Current, Attributes.OperationId);
+                var traceId = ParseTraceId(operationId);
                 if (String.IsNullOrEmpty(traceId))
                 {
-                    _logger.LogWarning("Skip processing telemetry! Property '" + Attributes.OperationId + "' is missing");
+                    _logger.LogWarning("Skip processing telemetry! Property '" + Attributes.OperationId + "' is invalid ('" + operationId + "'). Please make sure W3C TraceContext standard is is configured.");
                     continue;
                 }
 
