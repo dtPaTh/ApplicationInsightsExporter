@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Google.Protobuf;
 using Opentelemetry.Proto.Trace.V1;
 using Opentelemetry.Proto.Common.V1;
