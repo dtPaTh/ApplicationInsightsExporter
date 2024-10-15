@@ -3,8 +3,7 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "EHConnection": "***REMOVED***",
-    "OTLP_HEADER_AUTHORIZATION": "***REMOVED***",
-    "OTLP_ENDPOINT": "***REMOVED***"
+    "EHConnection": "<YourEventHubConnectionString>",
+    "OTLP_ENDPOINT": "http://localhost:4318/v1/traces"
   }
 }
