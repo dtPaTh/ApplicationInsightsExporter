@@ -24,7 +24,7 @@ namespace ApplicationInsightsForwarderWorker
             _client = httpClientFactory.CreateClient("ApplicationInsightsExporter");
 
             _otlpEndpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
-            if (!_otlpEndpoint.Contains("v1/traces"))
+            if (!String.IsNullOrEmpty(_otlpEndpoint) && _otlpEndpoint.Contains("v1/traces"))
                 if (_otlpEndpoint.EndsWith("/"))
                     _otlpEndpoint = _otlpEndpoint += "v1/traces";
                 else
@@ -32,7 +32,7 @@ namespace ApplicationInsightsForwarderWorker
         }
 
         [Function("ForwardAI")]
-        public async Task Run([EventHubTrigger("appinsights", Connection = "EHConnection")] EventData[] events, ILogger log)
+        public async Task Run([EventHubTrigger("appinsights", Connection = "EHConnection")] EventData[] events)
         {
             var exceptions = new List<Exception>();
 
@@ -53,7 +53,7 @@ namespace ApplicationInsightsForwarderWorker
                     var res = await _client.PostAsync(_otlpEndpoint, content);
                     if (!res.IsSuccessStatusCode)
                     {
-                        log.LogError("Couldn't send span " + (res.StatusCode) + "\n" + messageBody);
+                        _logger.LogError("Couldn't send span " + (res.StatusCode) + "\n" + messageBody);
                     }
 
                     await Task.Yield();
