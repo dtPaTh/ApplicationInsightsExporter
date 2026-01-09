@@ -9,40 +9,29 @@ namespace ApplicationInsightsForwarderWorker
     public class ApplicationInsightsForwarder
     {
         private readonly ILogger<ApplicationInsightsForwarder> _logger;
+        private readonly ForwarderConfig _config;
+        private readonly ApplicationInsights2OTLP.Convert _converter;
+        private readonly HttpClient _httpClient;
 
-
-        HttpClient _client;
-        string _otlpEndpoint;
-        ApplicationInsights2OTLP.Convert _converter;
-
-
-        public ApplicationInsightsForwarder(ILogger<ApplicationInsightsForwarder> logger, IHttpClientFactory httpClientFactory, ApplicationInsights2OTLP.Convert otlpConverter)
+        public ApplicationInsightsForwarder(ILogger<ApplicationInsightsForwarder> logger, IHttpClientFactory httpClientFactory, ForwarderConfig config, ApplicationInsights2OTLP.Convert otlpConverter)
         {
             _logger = logger;
             _converter = otlpConverter;
+            _config = config;
 
-            _client = httpClientFactory.CreateClient("ApplicationInsightsExporter");
-
-            _otlpEndpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
-            if (!String.IsNullOrEmpty(_otlpEndpoint) && _otlpEndpoint.Contains("v1/traces"))
-                if (_otlpEndpoint.EndsWith("/"))
-                    _otlpEndpoint = _otlpEndpoint += "v1/traces";
-                else
-                    _otlpEndpoint = _otlpEndpoint += "/v1/traces";
+            _httpClient = httpClientFactory.CreateClient("ApplicationInsightsExporter");
         }
 
         [Function("ForwardAI")]
         public async Task Run([EventHubTrigger("appinsights", Connection = "EHConnection")] EventData[] events)
         {
-            var exceptions = new List<Exception>();
-
             foreach (EventData eventData in events)
             {
+                string messageBody = string.Empty;
                 try
                 {
-                    //string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
                     byte[] msgBody = eventData.Body.ToArray();
-                    string messageBody = Encoding.UTF8.GetString(msgBody, 0, msgBody.Length);
+                    messageBody = Encoding.UTF8.GetString(msgBody, 0, msgBody.Length);
 
                     var exportTraceServiceRequest = _converter.FromApplicationInsights(messageBody);
                     if (exportTraceServiceRequest == null) // if format was not able to be processed/mapped.. 
@@ -50,28 +39,19 @@ namespace ApplicationInsightsForwarderWorker
 
                     var content = new ApplicationInsights2OTLP.ExportRequestContent(exportTraceServiceRequest);
 
-                    var res = await _client.PostAsync(_otlpEndpoint, content);
+                    var res = await _httpClient.PostAsync(_config.OTLPEndpoint, content);
                     if (!res.IsSuccessStatusCode)
                     {
-                        _logger.LogError("Couldn't send span " + (res.StatusCode) + "\n" + messageBody);
+                        _logger.LogError("Couldn't send spans. HTTP Status:  " + (res.StatusCode));
                     }
-
-                    await Task.Yield();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    // We need to keep processing the rest of the batch - capture this exception and continue.
-                    // Also, consider capturing details of the message that failed processing so it can be processed again later.
-                    exceptions.Add(e);
+                    _logger.LogError($"An error occurred while processing a message. Error: {ex.Message}. StackTrace: {ex.StackTrace}");
+                    _logger.LogDebug("Unprocessed message: ");
+                    _logger.LogDebug(messageBody);
                 }
             }
-
-            // Once processing of the batch is complete, if any messages in the batch failed processing throw an exception so that there is a record of the failure.
-            if (exceptions.Count > 1)
-                throw new AggregateException(exceptions);
-
-            if (exceptions.Count == 1)
-                throw exceptions.Single();
         }
     }
 }

@@ -1,6 +1,6 @@
 # Application Insights Exporter for OpenTelemetry
 
-The Application Insights Exporter allows to read traces exported from Azure Application Insights and send it to an OpenTelemetry OTLP compatible endpoint. 
+The Application Insights Exporter enables to read traces exported from Azure Application Insights and send it to an OpenTelemetry OTLP compatible endpoint. 
 
 ### Original Trace in Application Insights
 ![](ai-trace.png)
@@ -20,14 +20,8 @@ Supported OpenTelemetry formats are:
 
 ## Getting Started
 
-The project contains 2 Azure Functions targeting different deployment models: 
-* ApplicationInsightsForwarderWorker  (.NET 8 isolated worker)
-* ApplicationInsightsForwarder (.NET 6 in-process)[^1]
-
-[^1]: It is recommended to use the ApplicationInsightsForwarderWorker function using the isolated worker model as recommended by Microsoft [here](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/net-on-azure-functions-march-2024-roadmap-update/ba-p/4097744).  
-
 ### Pre-Requisites
-* Create or configure an Azure EventHub to which you want to forward the telemetry from your Application Insights instance. 
+* Create or configure an Azure EventHub to forward the telemetry from your Application Insights instance. 
 * If your target backend doesn't support OLTP/HTTP binary format, you can use an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) as a receiving endpoint for the Azure Function. 
 
 ### Sending trace telemetry to EventHub
@@ -94,7 +88,7 @@ The GitHub action now has all necessary details to deploy the function code to y
 The workflow is configured to be manually triggered.
   * In GitHub, go to your forked repository.
   * Go to **Actions**.
-  * Select the workflow **Deploy ApplicationInsightsForwarderWorker** or **Deploy ApplicationInsightsForwarder**.
+  * Select the workflow **Deploy ApplicationInsightsForwarderWorker**.
   * Select **Run workflow**
 
 
@@ -130,11 +124,6 @@ docker run -p 4318:4318  -e OTLPHTTP_ENDPOINT="<Your-receiving-OTLP-endpoint>" -
 ```
 
 **Note**: Replace *&lt;Your-receiving-OTLP-endpoint&gt;* and *&lt;Your-api-token&gt;* with the values matching your trace backend's configuration
-
-## Release Notes
-* v0.1.0 - Initial release supporting AppDependency, AppRequests mapped and forwarded to OTLP/HTTP JSON
-* v0.9.0 - Swichting from OTLP/HTTP json format to OTLP/HTTP binary format. 
-* v1.0.0 - Updating attribute mapping to better fit OpenTelemetry semantic conventions. Added a new forwarder function based on .NET 8 isolated worker model. 
 
 ## Contribute
 This is an open source project, and we gladly accept new contributions and contributors.  

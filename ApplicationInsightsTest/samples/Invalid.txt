@@ -1,0 +1,1 @@
+SOME Log-line WITHOUT proper format

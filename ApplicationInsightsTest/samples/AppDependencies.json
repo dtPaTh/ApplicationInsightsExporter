@@ -1,0 +1,40 @@
+{
+    "records": [
+        {
+            "time": "2021-12-14T16:12:28.2953931Z",
+            "resourceId": "/SUBSCRIPTIONS/ffffffff-86A1-46E8-B51D-609B547112AE/RESOURCEGROUPS/APPINSIGHTSTRACECONTEXTDEMO/PROVIDERS/MICROSOFT.INSIGHTS/COMPONENTS/TRACEDEMO",
+            "ResourceGUID": "eae58f32-b4d5-4d7d-b693-e30c8f18f147",
+            "Type": "AppDependencies",
+            "AppRoleInstance": "91aa43fb9caf198ae50daa2775026caa42154d7f5bcb889a3513998ed2073fd5",
+            "AppRoleName": "forwardmycontext",
+            "ClientCity": "Amsterdam",
+            "ClientCountryOrRegion": "Netherlands",
+            "ClientIP": "0.0.0.0",
+            "ClientStateOrProvince": "North Holland",
+            "ClientType": "PC",
+            "IKey": "309effd4-0329-492a-bce4-da024fc6e609",
+            "_BilledSize": 1004,
+            "OperationName": "Forward",
+            "OperationId": "739129be235aad49b52dbfa78c0ba648",
+            "ParentId": "7a020fdfe6615e46",
+            "SDKVersion": "rdddsc:2.17.0-146",
+            "Properties": {
+                "InvocationId": "f12d3964-717b-48b1-aaf1-f0da81ae5e3e",
+                "Category": "Function.Forward",
+                "LogLevel": "Information",
+                "ProcessId": "6616",
+              "HostInstanceId": "b14a9fd9-139f-45f9-8737-18a0c60bdae1"
+            },
+            "Id": "beb1e03277f31e4f",
+            "Target": "receivecontext.azurewebsites.net",
+            "DependencyType": "HTTP",
+            "Name": "GET /api/Receiver",
+            "Data": "https://someotherservice.urewebsites.net/api/Receiver",
+            "Success": true,
+            "ResultCode": "200",
+            "DurationMs": 86.8516,
+            "PerformanceBucket": "<250ms",
+            "ItemCount": 1
+        }
+    ]
+}

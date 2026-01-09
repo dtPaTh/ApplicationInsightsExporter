@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationInsightsForwarder", "ApplicationInsightsForwarder\ApplicationInsightsForwarder.csproj", "{5D1B5637-9B86-44C9-8C4B-8AE468ED175C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationInsights2OLTP", "ApplicationInsights2OLTP\ApplicationInsights2OLTP.csproj", "{4F41F104-8FED-40B4-B372-75788F82F592}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2B32C782-BED1-45F7-8FF6-8919C2307D78}"
@@ -16,16 +14,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationInsightsForwarderWorker", "ApplicationInsightsForwarderWorker\ApplicationInsightsForwarderWorker.csproj", "{95B9CB3E-6FF6-44AA-BA16-ED3B59114BBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationInsightsTest", "ApplicationInsightsTest\ApplicationInsightsTest.csproj", "{E5FF96B0-3214-B867-9F2B-09EC9A3EF162}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5D1B5637-9B86-44C9-8C4B-8AE468ED175C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D1B5637-9B86-44C9-8C4B-8AE468ED175C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D1B5637-9B86-44C9-8C4B-8AE468ED175C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D1B5637-9B86-44C9-8C4B-8AE468ED175C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F41F104-8FED-40B4-B372-75788F82F592}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -34,6 +30,10 @@ Global
 		{95B9CB3E-6FF6-44AA-BA16-ED3B59114BBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95B9CB3E-6FF6-44AA-BA16-ED3B59114BBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95B9CB3E-6FF6-44AA-BA16-ED3B59114BBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5FF96B0-3214-B867-9F2B-09EC9A3EF162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5FF96B0-3214-B867-9F2B-09EC9A3EF162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5FF96B0-3214-B867-9F2B-09EC9A3EF162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5FF96B0-3214-B867-9F2B-09EC9A3EF162}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

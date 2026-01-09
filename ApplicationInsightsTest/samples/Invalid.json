@@ -1,0 +1,32 @@
+{
+  "time": "2023-11-15T12:34:56.789Z",
+  "iKey": "00000000-0000-0000-0000-000000000000",
+  "name": "Microsoft.ApplicationInsights.Trace",
+  "tags": {
+    "ai.cloud.role": "my-app-service",
+    "ai.cloud.roleInstance": "my-app-instance",
+    "ai.operation.id": "1234567890abcdef",
+    "ai.operation.parentId": "abcdef123456",
+    "ai.operation.name": "GET /api/values",
+    "ai.location.ip": "192.168.1.1",
+    "ai.user.id": "user123",
+    "ai.session.id": "session123",
+    "ai.device.id": "device123",
+    "ai.device.type": "PC"
+  },
+  "data": {
+    "baseType": "MessageData",
+    "baseData": {
+      "ver": 2,
+      "message": "This is a sample trace message.",
+      "severityLevel": 1,
+      "properties": {
+        "customProperty1": "value1",
+        "customProperty2": "value2",
+        "httpMethod": "GET",
+        "httpPath": "/api/values",
+        "httpStatusCode": "200"
+      }
+    }
+  }
+}

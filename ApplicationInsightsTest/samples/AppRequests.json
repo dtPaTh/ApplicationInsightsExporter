@@ -1,0 +1,43 @@
+{
+    "records": [
+      {
+        "time": "2021-12-14T10:07:28.1437232Z",
+        "resourceId": "/SUBSCRIPTIONS/7dfdfDFA-86A1-46E8-B51D-609B547112AE/RESOURCEGROUPS/APPINSIGHTSTRACECONTEXTDEMO/PROVIDERS/MICROSOFT.INSIGHTS/COMPONENTS/TRACEDEMO",
+        "ResourceGUID": "eae5dd32-b4d5-4d7d-b693-e30c8f18f147",
+        "Type": "AppRequests",
+        "AppRoleInstance": "91aa43fb9caf19ffff0daa2775026caa42154d7f5bcb889a3513998ed2073fd5",
+        "AppRoleName": "apprequesttest",
+        "ClientCity": "Amsterdam",
+        "ClientCountryOrRegion": "Netherlands",
+        "ClientIP": "0.0.0.0",
+        "ClientStateOrProvince": "North Holland",
+        "ClientType": "PC",
+        "IKey": "309effd4-0329-492a-bce4-da02ffc6e609",
+        "_BilledSize": 1063,
+        "OperationName": "AppRequestTest",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "ParentId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "SDKVersion": "azurefunctions: 3.3.1.0",
+        "Properties": {
+          "HttpMethod": "GET",
+          "FunctionExecutionTimeMs": "92.7588",
+          "InvocationId": "f4399902-7c87-48ee-a0be-e659f6ea2d2d",
+          "Category": "Host.Results",
+          "TriggerReason": "This function was programmatically called via the host APIs.",
+          "FullName": "Forward",
+          "LogLevel": "Information",
+          "HttpPath": "/api/Forward",
+          "ProcessId": "6616",
+          "HostInstanceId": "b14a9f59-139f-45f9-8737-18a0c60bdae1"
+        },
+        "Id": "95a7e634a629fd4f",
+        "Name": "AppRequestTest",
+        "Url": "https://someservice.azurewebsites.net/api/Forward",
+        "Success": true,
+        "ResultCode": "200",
+        "DurationMs": 98.4657,
+        "PerformanceBucket": "<250ms",
+        "ItemCount": 1
+      }
+    ]
+}

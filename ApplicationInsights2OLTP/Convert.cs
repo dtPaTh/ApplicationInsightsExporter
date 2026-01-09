@@ -233,158 +233,163 @@ namespace ApplicationInsights2OTLP
         public ExportTraceServiceRequest FromApplicationInsights(string appInsightsJsonStr)
         {
 
-            _logger.LogDebug(appInsightsJsonStr);
-
-            var export = new ExportTraceServiceRequest();
-
-            var resSpan = new ResourceSpans();
-            export.ResourceSpans.Add(resSpan);
-
             var root = JsonDocument.Parse(appInsightsJsonStr);
 
-            var t = root.RootElement.GetProperty(TelemetryConstants.Records).EnumerateArray();
-            while (t.MoveNext())
+            if (root.RootElement.TryGetProperty(TelemetryConstants.Records, out var records))
             {
-                var operationId = Value(t.Current, Attributes.OperationId);
-                var traceId = ParseTraceId(operationId);
-                if (String.IsNullOrEmpty(traceId))
+                var export = new ExportTraceServiceRequest();
+
+                var resSpan = new ResourceSpans();
+                export.ResourceSpans.Add(resSpan);
+
+                var t = records.EnumerateArray();
+                while (t.MoveNext())
                 {
-                    _logger.LogWarning("Skip processing telemetry! Property '" + Attributes.OperationId + "' is invalid ('" + operationId + "'). Please make sure W3C TraceContext standard is is configured.");
-                    continue;
-                }
-
-                var parentId = Value(t.Current, Attributes.ParentId); 
-                if (parentId == Value(t.Current, Attributes.OperationId))
-                    parentId = "";
-
-                JsonElement properties;
-                bool hasProperties = false;
-
-                resSpan.Resource = new Resource();
-                
-                TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceName,Value(t.Current, Attributes.AppRoleName));
-                TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceInstance, Value(t.Current, Attributes.AppRoleInstance));
-                if (t.Current.TryGetProperty(TelemetryConstants.Properties, out properties))
-                {
-                    hasProperties = true;
-                    TryAddResourceAttribute(resSpan, OTelSemConv.AttributeProcessId, Value(properties, Properties.ProcessId));
-                    TryAddResourceAttribute(resSpan, OTelSemConv.AttributeHostId, Value(properties, Properties.HostInstanceId));
-                }
-
-                var libSpan = new InstrumentationLibrarySpans();
-
-                var instr = Value(t.Current, Attributes.SDKVersion).Split(new char[] {':'});
-
-                libSpan.InstrumentationLibrary = new InstrumentationLibrary()
-                {
-                    Name = instr[0] ?? ApplicationInsights.SemanticConventions.InstrumentationLibraryName,
-                    Version = instr[1] ?? String.Empty
-                };
-                resSpan.InstrumentationLibrarySpans.Add(libSpan);
-
-                var span = new Span();
-                libSpan.Spans.Add(span);
-
-                span.TraceId = ConvertToByteString(traceId);
-                span.SpanId = ConvertToByteString(Value(t.Current, Attributes.Id));
-                if (!String.IsNullOrEmpty(parentId))
-                    span.ParentSpanId = ConvertToByteString(parentId);
-
-                var spanType = Value(t.Current, Attributes.Type);
-                string spanName = Value(t.Current, Attributes.Name);
-
-                TryAddAttribute(span, AISemConv.TelemetryType, spanType);
-                if (spanType == TelemetryTypes.AppDependencies)
-                {
-                    try
+                    var operationId = Value(t.Current, Attributes.OperationId);
+                    var traceId = ParseTraceId(operationId);
+                    if (String.IsNullOrEmpty(traceId))
                     {
-                        string dt = Value(t.Current, Attributes.DependencyType);
+                        _logger.LogWarning("Skip processing telemetry! Property '" + Attributes.OperationId + "' is invalid ('" + operationId + "'). Please make sure W3C TraceContext standard is is configured.");
+                        continue;
+                    }
 
-                        span.Kind = MapSpanKind(spanType, dt);
-                        
-                        switch (dt)
+                    var parentId = Value(t.Current, Attributes.ParentId);
+                    if (parentId == Value(t.Current, Attributes.OperationId))
+                        parentId = "";
+
+                    JsonElement properties;
+                    bool hasProperties = false;
+
+                    resSpan.Resource = new Resource();
+
+                    TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceName, Value(t.Current, Attributes.AppRoleName));
+                    TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceInstance, Value(t.Current, Attributes.AppRoleInstance));
+                    if (t.Current.TryGetProperty(TelemetryConstants.Properties, out properties))
+                    {
+                        hasProperties = true;
+                        TryAddResourceAttribute(resSpan, OTelSemConv.AttributeProcessId, Value(properties, Properties.ProcessId));
+                        TryAddResourceAttribute(resSpan, OTelSemConv.AttributeHostId, Value(properties, Properties.HostInstanceId));
+                    }
+
+                    var libSpan = new InstrumentationLibrarySpans();
+
+                    var instr = Value(t.Current, Attributes.SDKVersion).Split(new char[] { ':' });
+
+                    libSpan.InstrumentationLibrary = new InstrumentationLibrary()
+                    {
+                        Name = instr[0] ?? ApplicationInsights.SemanticConventions.InstrumentationLibraryName,
+                        Version = instr[1] ?? String.Empty
+                    };
+                    resSpan.InstrumentationLibrarySpans.Add(libSpan);
+
+                    var span = new Span();
+                    libSpan.Spans.Add(span);
+
+                    span.TraceId = ConvertToByteString(traceId);
+                    span.SpanId = ConvertToByteString(Value(t.Current, Attributes.Id));
+                    if (!String.IsNullOrEmpty(parentId))
+                        span.ParentSpanId = ConvertToByteString(parentId);
+
+                    var spanType = Value(t.Current, Attributes.Type);
+                    string spanName = Value(t.Current, Attributes.Name);
+
+                    TryAddAttribute(span, AISemConv.TelemetryType, spanType);
+                    if (spanType == TelemetryTypes.AppDependencies)
+                    {
+                        try
                         {
-                            case DependencyTypes.Http: 
-                            case DependencyTypes.HttpTracked:
+                            string dt = Value(t.Current, Attributes.DependencyType);
+
+                            span.Kind = MapSpanKind(spanType, dt);
+
+                            switch (dt)
                             {
-                                var req = Value(t.Current, Attributes.Name).Split(new char[] { ' ' });
+                                case DependencyTypes.Http:
+                                case DependencyTypes.HttpTracked:
+                                    {
+                                        var req = Value(t.Current, Attributes.Name).Split(new char[] { ' ' });
 
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpMethod, req[0]);
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpTarget, req[1]);
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpUrl, Value(t.Current, Attributes.Data));
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpStatusCode, Value(t.Current, Attributes.ResultCode));
-                                break;
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpMethod, req[0]);
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpTarget, req[1]);
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpUrl, Value(t.Current, Attributes.Data));
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpStatusCode, Value(t.Current, Attributes.ResultCode));
+                                        break;
+                                    }
+                                case DependencyTypes.Backend:
+                                    {
+                                        spanName = DependencyTypes.Backend.ToUpper() + " " + spanName;
+
+                                        var req = Value(t.Current, Attributes.Data).Split(" - ");
+
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpUrl, req[1]);
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpMethod, req[0]);
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpTarget, Value(t.Current, Attributes.Target));
+                                        TryAddAttribute(span, OTelSemConv.AttributeHttpStatusCode, Value(t.Current, Attributes.ResultCode));
+                                        break;
+                                    }
+                                case DependencyTypes.AzureServiceBus:
+                                case DependencyTypes.AzureServiceBusMessage:
+                                    {
+                                        var target = Value(t.Current, Attributes.Target).Split(new char[] { '/' });
+                                        TryAddAttribute(span, OTelSemConv.AttributePeerService, target[0]);
+                                        TryAddAttribute(span, OTelSemConv.AttributeMessageBusDestination, target[1]);
+
+                                        TryAddAttribute(span, OTelSemConv.AttributeMessagingSystem, OTelSemConv.MessagingSystemAzureServiceBus);
+                                        TryAddAttribute(span, OTelSemConv.AttributeMessagingDestination, Value(t.Current, Attributes.Target));
+
+                                        if (dt == DependencyTypes.AzureServiceBus)
+                                            TryAddAttribute(span, OTelSemConv.AttributeMessagingOperation, OTelSemConv.MessagingOperationDeliver);
+                                        else
+                                            TryAddAttribute(span, OTelSemConv.AttributeMessagingOperation, OTelSemConv.MessagingOperationCreate);
+
+                                        break;
+                                    }
                             }
-                            case DependencyTypes.Backend:
-                            {
-                                spanName = DependencyTypes.Backend.ToUpper() + " " + spanName;
 
-                                var req = Value(t.Current, Attributes.Data).Split(" - ");
+                            TryAddAttribute(span, AISemConv.DependencyType, dt);
 
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpUrl, req[1]);
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpMethod, req[0]);
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpTarget, Value(t.Current, Attributes.Target));
-                                TryAddAttribute(span, OTelSemConv.AttributeHttpStatusCode, Value(t.Current, Attributes.ResultCode));
-                                break;
-                            }
-                            case DependencyTypes.AzureServiceBus:
-                            case DependencyTypes.AzureServiceBusMessage:
-                            {
-                                var target = Value(t.Current, Attributes.Target).Split(new char[] { '/' });
-                                TryAddAttribute(span, OTelSemConv.AttributePeerService,  target[0]);
-                                TryAddAttribute(span, OTelSemConv.AttributeMessageBusDestination, target[1]);
 
-                                TryAddAttribute(span, OTelSemConv.AttributeMessagingSystem, OTelSemConv.MessagingSystemAzureServiceBus);
-                                TryAddAttribute(span, OTelSemConv.AttributeMessagingDestination, Value(t.Current, Attributes.Target));
-                                
-                                if (dt == DependencyTypes.AzureServiceBus)
-                                    TryAddAttribute(span, OTelSemConv.AttributeMessagingOperation, OTelSemConv.MessagingOperationDeliver);
-                                else
-                                    TryAddAttribute(span, OTelSemConv.AttributeMessagingOperation, OTelSemConv.MessagingOperationCreate);
-                                
-                                break;
-                            }
                         }
-
-                        TryAddAttribute(span, AISemConv.DependencyType, dt);
-                        
-
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Error parsing telemetry of type 'AppDependency'");
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        _logger.LogError(e, "Error parsing telemetry of type 'AppDependency'");
+                        span.Kind = MapSpanKind(spanType, String.Empty);
                     }
-                }
-                else
-                {
-                    span.Kind = MapSpanKind(spanType, String.Empty);
-                }
-                
-                TryAddAttribute(span, AISemConv.OperationName, Value(t.Current, Attributes.OperationName));
-                TryAddAttribute(span, AISemConv.Target, Value(t.Current, Attributes.Source));
-                TryAddAttribute(span, AISemConv.Source, Value(t.Current, Attributes.Target));
-                TryAddAttribute(span, AISemConv.Url, Value(t.Current, Attributes.Url));
-                TryAddAttribute(span, AISemConv.Data, Value(t.Current, Attributes.Data));
-                TryAddAttribute(span, AISemConv.Status, Value(t.Current, Attributes.Status));
-                TryAddAttribute(span, AISemConv.ResultCode, Value(t.Current, Attributes.ResultCode));
+
+                    TryAddAttribute(span, AISemConv.OperationName, Value(t.Current, Attributes.OperationName));
+                    TryAddAttribute(span, AISemConv.Target, Value(t.Current, Attributes.Source));
+                    TryAddAttribute(span, AISemConv.Source, Value(t.Current, Attributes.Target));
+                    TryAddAttribute(span, AISemConv.Url, Value(t.Current, Attributes.Url));
+                    TryAddAttribute(span, AISemConv.Data, Value(t.Current, Attributes.Data));
+                    TryAddAttribute(span, AISemConv.Status, Value(t.Current, Attributes.Status));
+                    TryAddAttribute(span, AISemConv.ResultCode, Value(t.Current, Attributes.ResultCode));
 
 
-                span.Name = spanName;
-                span.StartTimeUnixNano = ConvertTimeStampToNano(Value(t.Current, Attributes.Time));
-                span.EndTimeUnixNano = ConvertTimeSpanToNano(Value(t.Current, Attributes.Time), t.Current.GetProperty(Attributes.Duration).GetDouble());
+                    span.Name = spanName;
+                    span.StartTimeUnixNano = ConvertTimeStampToNano(Value(t.Current, Attributes.Time));
+                    span.EndTimeUnixNano = ConvertTimeSpanToNano(Value(t.Current, Attributes.Time), t.Current.GetProperty(Attributes.Duration).GetDouble());
 
-                if (hasProperties)
-                {
-                    var l = properties.EnumerateObject();
-                    while (l.MoveNext())
+                    if (hasProperties)
                     {
-                        TryMapProperties(span, l.Current.Name, l.Current.Value.GetString());
+                        var l = properties.EnumerateObject();
+                        while (l.MoveNext())
+                        {
+                            TryMapProperties(span, l.Current.Name, l.Current.Value.GetString());
+                        }
                     }
+
                 }
-                
+
+                return export;
             }
-
-            return export;
+            else
+            {
+                throw new ArgumentException("No '" + TelemetryConstants.Records + "' found in the provided ApplicationInsights JSON.");
+            }
         }
     }
 }
