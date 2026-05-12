@@ -28,6 +28,8 @@ namespace ApplicationInsights2OTLP
 
         public readonly bool _SimulateRealtime = false;
 
+        private readonly string? _producerUserAgent;
+
         private static readonly Regex TraceIdRegex = new Regex("^[a-fA-F0-9]{32}$", RegexOptions.Compiled);
 
 
@@ -35,6 +37,11 @@ namespace ApplicationInsights2OTLP
         {
             _logger = loggerFactory?.CreateLogger<Convert>()
               ?? NullLoggerFactory.Instance.CreateLogger<Convert>();
+        }
+
+        public Convert(ILoggerFactory? loggerFactory, string? producerUserAgent) : this(loggerFactory)
+        {
+            _producerUserAgent = producerUserAgent;
         }
 #if DEBUG
         public Convert(ILoggerFactory? loggerFactory,bool simulateRealtime): this(loggerFactory)
@@ -264,6 +271,7 @@ namespace ApplicationInsights2OTLP
 
                     TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceName, Value(t.Current, Attributes.AppRoleName));
                     TryAddResourceAttribute(resSpan, OTelSemConv.AttributeServiceInstance, Value(t.Current, Attributes.AppRoleInstance));
+                    TryAddResourceAttribute(resSpan, AISemConv.ForwarderUserAgent, _producerUserAgent ?? "");
                     if (t.Current.TryGetProperty(TelemetryConstants.Properties, out properties))
                     {
                         hasProperties = true;
@@ -361,8 +369,8 @@ namespace ApplicationInsights2OTLP
                     }
 
                     TryAddAttribute(span, AISemConv.OperationName, Value(t.Current, Attributes.OperationName));
-                    TryAddAttribute(span, AISemConv.Target, Value(t.Current, Attributes.Source));
-                    TryAddAttribute(span, AISemConv.Source, Value(t.Current, Attributes.Target));
+                    TryAddAttribute(span, AISemConv.Target, Value(t.Current, Attributes.Target));
+                    TryAddAttribute(span, AISemConv.Source, Value(t.Current, Attributes.Source));
                     TryAddAttribute(span, AISemConv.Url, Value(t.Current, Attributes.Url));
                     TryAddAttribute(span, AISemConv.Data, Value(t.Current, Attributes.Data));
                     TryAddAttribute(span, AISemConv.Status, Value(t.Current, Attributes.Status));

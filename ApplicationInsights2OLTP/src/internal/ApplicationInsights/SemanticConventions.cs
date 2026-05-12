@@ -22,6 +22,9 @@ namespace ApplicationInsights
         public const string Target = ScopeAppInsights + ".target";
         public const string ResultCode = ScopeAppInsights + ".resultcode";
 
+        public const string ScopeAppInsightsForwarder = "appinsightsforwarder";
+        public const string ForwarderUserAgent = ScopeAppInsightsForwarder + ".useragent";
+
         
 
     }

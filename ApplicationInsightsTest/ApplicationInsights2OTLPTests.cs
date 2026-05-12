@@ -106,6 +106,10 @@ namespace ApplicationInsightsTest
             Assert.AreEqual("AppDependencies", getAttr("appinsights.type"));
             Assert.AreEqual("HTTP", getAttr("appinsights.dependencytype"));
 
+            // target maps from AI 'Target' (regression guard against historical target/source swap)
+            Assert.AreEqual("receivecontext.azurewebsites.net", getAttr("appinsights.target"));
+            Assert.IsNull(getAttr("appinsights.source"));
+
             // http semantic attrs
             Assert.AreEqual("GET", getAttr("http.method"));
             Assert.AreEqual("/api/Receiver", getAttr("http.target"));
@@ -114,6 +118,29 @@ namespace ApplicationInsightsTest
 
             Assert.Greater(span.StartTimeUnixNano, 0UL);
             Assert.Greater(span.EndTimeUnixNano, span.StartTimeUnixNano);
+        }
+
+        [Test]
+        public void ProducerInfoEmittedAsResourceAttributes()
+        {
+            string json = File.ReadAllText("samples/AppRequests.json");
+            var ua = "ApplicationInsightsForwarder/9.9.9 (+https://github.com/dtPaTh/ApplicationInsightsExporter)";
+            var conv = new ApplicationInsights2OTLP.Convert(null, ua);
+            var req = conv.FromApplicationInsights(json);
+
+            var resAttrs = req.ResourceSpans[0].Resource.Attributes;
+            Assert.AreEqual(ua, resAttrs.First(a => a.Key == "appinsightsforwarder.useragent").Value.StringValue);
+        }
+
+        [Test]
+        public void ProducerInfoOmittedWhenNotProvided()
+        {
+            string json = File.ReadAllText("samples/AppRequests.json");
+            var conv = new ApplicationInsights2OTLP.Convert(null);
+            var req = conv.FromApplicationInsights(json);
+
+            var resAttrs = req.ResourceSpans[0].Resource.Attributes;
+            Assert.IsFalse(resAttrs.Any(a => a.Key == "appinsightsforwarder.useragent"));
         }
 
         [Test]
