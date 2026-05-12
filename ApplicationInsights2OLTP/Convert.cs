@@ -252,6 +252,13 @@ namespace ApplicationInsights2OTLP
                 var t = records.EnumerateArray();
                 while (t.MoveNext())
                 {
+                    var spanType = Value(t.Current, Attributes.Type);
+                    if (spanType != TelemetryTypes.AppRequests && spanType != TelemetryTypes.AppDependencies)
+                    {
+                        _logger.LogDebug("Skipping unsupported telemetry type '" + spanType + "'");
+                        continue;
+                    }
+
                     var operationId = Value(t.Current, Attributes.OperationId);
                     var traceId = ParseTraceId(operationId);
                     if (String.IsNullOrEmpty(traceId))
@@ -298,7 +305,6 @@ namespace ApplicationInsights2OTLP
                     if (!String.IsNullOrEmpty(parentId))
                         span.ParentSpanId = ConvertToByteString(parentId);
 
-                    var spanType = Value(t.Current, Attributes.Type);
                     string spanName = Value(t.Current, Attributes.Name);
 
                     TryAddAttribute(span, AISemConv.TelemetryType, spanType);

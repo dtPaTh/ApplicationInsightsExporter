@@ -1,0 +1,35 @@
+{
+    "records": [
+      {
+        "time": "2021-12-14T10:07:28.1437232Z",
+        "Type": "AppRequests",
+        "AppRoleInstance": "instance-1",
+        "AppRoleName": "mixedtest",
+        "OperationName": "RequestThatShouldSurvive",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "ParentId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "SDKVersion": "azurefunctions: 3.3.1.0",
+        "Id": "95a7e634a629fd4f",
+        "Name": "RequestThatShouldSurvive",
+        "Url": "https://someservice.azurewebsites.net/api/Mixed",
+        "Success": true,
+        "ResultCode": "200",
+        "DurationMs": 12.34
+      },
+      {
+        "time": "2021-12-14T10:07:28.5000000Z",
+        "Type": "AppExceptions",
+        "AppRoleInstance": "instance-1",
+        "AppRoleName": "mixedtest",
+        "OperationName": "ExceptionThatShouldBeSkipped",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "ParentId": "95a7e634a629fd4f",
+        "SDKVersion": "azurefunctions: 3.3.1.0",
+        "Id": "aaaaaaaaaaaaaaaa",
+        "Name": "ExceptionThatShouldBeSkipped",
+        "ProblemId": "System.InvalidOperationException at Some.Method",
+        "ExceptionType": "System.InvalidOperationException",
+        "OuterMessage": "boom"
+      }
+    ]
+}

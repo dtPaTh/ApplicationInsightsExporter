@@ -121,6 +121,23 @@ namespace ApplicationInsightsTest
         }
 
         [Test]
+        public void UnsupportedTelemetryTypesAreSkippedWithoutFailingBatch()
+        {
+            string json = File.ReadAllText("samples/Mixed.json");
+            var conv = new ApplicationInsights2OTLP.Convert(null);
+            var req = conv.FromApplicationInsights(json);
+
+            Assert.IsNotNull(req);
+            // Mixed.json contains 1 AppRequests + 1 AppExceptions, distinctly named so we can
+            // verify which one survived (not just that count == 1).
+            var spans = req.ResourceSpans[0].InstrumentationLibrarySpans[0].Spans;
+            Assert.AreEqual(1, spans.Count, "Unsupported telemetry types must be skipped, not crash the batch");
+            Assert.AreEqual("RequestThatShouldSurvive", spans[0].Name);
+            var opName = spans[0].Attributes.First(a => a.Key == "appinsights.operationname").Value.StringValue;
+            Assert.AreEqual("RequestThatShouldSurvive", opName);
+        }
+
+        [Test]
         public void ProducerInfoEmittedAsResourceAttributes()
         {
             string json = File.ReadAllText("samples/AppRequests.json");

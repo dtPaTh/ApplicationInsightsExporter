@@ -7,6 +7,7 @@
 
 ### Changes
 - `User-Agent` request header version token changed from `major.minor` (e.g. `1.1`) to full semver (e.g. `1.1.1`). Downstream consumers pinning the exact UA string will need to update.
+- Unsupported telemetry types (`AppExceptions`, `AppTraces`, etc.) are now explicitly skipped with a debug log instead of falling through and throwing on the missing `DurationMs` field. Previously, a single unsupported record in an EventData batch would crash conversion of the whole batch (all sibling records lost) and produce an error log; the new behavior preserves the rest of the batch and surfaces the skip only at debug level.
 
 ### Fixes
 - Fixed `appinsights.target` and `appinsights.source` attributes being swapped — they now reflect the AI `Target` and `Source` fields as defined by the spec. Downstream queries/dashboards that read these attributes from this forwarder may need to be updated.
