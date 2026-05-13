@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+### Changes
+- Updated OTLP proto to v1.10.0 (`InstrumentationLibrary*` types renamed to `ScopeSpans`/`InstrumentationScope`, namespace `Opentelemetry.*` → `OpenTelemetry.*`). Wire format binary-compatible.
+- Bumped `Google.Protobuf` and `Google.Protobuf.Tools` from `3.17.2` to `3.34.1`.
+
 ## 1.1.1
 
 ### Added

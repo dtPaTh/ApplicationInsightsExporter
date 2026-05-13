@@ -1,11 +1,11 @@
 using System;
 using Google.Protobuf;
-using Opentelemetry.Proto.Trace.V1;
-using Opentelemetry.Proto.Common.V1;
-using Opentelemetry.Proto.Resource.V1;
+using OpenTelemetry.Proto.Trace.V1;
+using OpenTelemetry.Proto.Common.V1;
+using OpenTelemetry.Proto.Resource.V1;
 using System.Text.Json;
 using System.Collections.Generic;
-using Opentelemetry.Proto.Collector.Trace.V1;
+using OpenTelemetry.Proto.Collector.Trace.V1;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using OpenTelemetry;
@@ -286,19 +286,19 @@ namespace ApplicationInsights2OTLP
                         TryAddResourceAttribute(resSpan, OTelSemConv.AttributeHostId, Value(properties, Properties.HostInstanceId));
                     }
 
-                    var libSpan = new InstrumentationLibrarySpans();
+                    var scopeSpan = new ScopeSpans();
 
                     var instr = Value(t.Current, Attributes.SDKVersion).Split(new char[] { ':' });
 
-                    libSpan.InstrumentationLibrary = new InstrumentationLibrary()
+                    scopeSpan.Scope = new InstrumentationScope()
                     {
-                        Name = instr[0] ?? ApplicationInsights.SemanticConventions.InstrumentationLibraryName,
+                        Name = instr[0] ?? ApplicationInsights.SemanticConventions.InstrumentationScopeName,
                         Version = instr[1] ?? String.Empty
                     };
-                    resSpan.InstrumentationLibrarySpans.Add(libSpan);
+                    resSpan.ScopeSpans.Add(scopeSpan);
 
                     var span = new Span();
-                    libSpan.Spans.Add(span);
+                    scopeSpan.Spans.Add(span);
 
                     span.TraceId = ConvertToByteString(traceId);
                     span.SpanId = ConvertToByteString(Value(t.Current, Attributes.Id));

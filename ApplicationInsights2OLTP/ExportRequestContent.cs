@@ -1,4 +1,4 @@
-﻿using Opentelemetry.Proto.Collector.Trace.V1;
+﻿using OpenTelemetry.Proto.Collector.Trace.V1;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Net.Http;

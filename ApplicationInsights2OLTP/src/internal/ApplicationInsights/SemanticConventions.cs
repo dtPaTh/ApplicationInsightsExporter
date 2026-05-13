@@ -6,7 +6,7 @@ namespace ApplicationInsights
 {
     internal static class SemanticConventions
     {
-        public const string InstrumentationLibraryName = "ApplicationInsights";
+        public const string InstrumentationScopeName = "ApplicationInsights";
 
         public const string ScopeAppInsights = "appinsights";
         public const string ScopeProperties = "prop";

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Opentelemetry.Proto.Trace.V1;
+using OpenTelemetry.Proto.Trace.V1;
 using System;
 using System.IO;
 using System.Linq;
@@ -39,15 +39,15 @@ namespace ApplicationInsightsTest
             Assert.IsNotNull(serviceNameAttr);
             Assert.AreEqual("apprequesttest", serviceNameAttr.Value.StringValue);
 
-            // instrumentation library
-            Assert.IsNotNull(resSpan.InstrumentationLibrarySpans);
-            Assert.AreEqual(1, resSpan.InstrumentationLibrarySpans.Count);
-            var lib = resSpan.InstrumentationLibrarySpans[0].InstrumentationLibrary;
-            Assert.IsNotNull(lib);
-            Assert.IsTrue(lib.Name.StartsWith("azurefunctions"), "Expected instrumentation library name to start with 'azurefunctions'");
+            // instrumentation scope
+            Assert.IsNotNull(resSpan.ScopeSpans);
+            Assert.AreEqual(1, resSpan.ScopeSpans.Count);
+            var scope = resSpan.ScopeSpans[0].Scope;
+            Assert.IsNotNull(scope);
+            Assert.IsTrue(scope.Name.StartsWith("azurefunctions"), "Expected instrumentation scope name to start with 'azurefunctions'");
 
             // spans
-            var spans = resSpan.InstrumentationLibrarySpans[0].Spans;
+            var spans = resSpan.ScopeSpans[0].Spans;
             Assert.AreEqual(1, spans.Count);
             var span = spans[0];
 
@@ -89,7 +89,7 @@ namespace ApplicationInsightsTest
             Assert.AreEqual(1, req.ResourceSpans.Count);
 
             var resSpan = req.ResourceSpans[0];
-            var spans = resSpan.InstrumentationLibrarySpans[0].Spans;
+            var spans = resSpan.ScopeSpans[0].Spans;
             Assert.AreEqual(1, spans.Count);
             var span = spans[0];
 
@@ -130,7 +130,7 @@ namespace ApplicationInsightsTest
             Assert.IsNotNull(req);
             // Mixed.json contains 1 AppRequests + 1 AppExceptions, distinctly named so we can
             // verify which one survived (not just that count == 1).
-            var spans = req.ResourceSpans[0].InstrumentationLibrarySpans[0].Spans;
+            var spans = req.ResourceSpans[0].ScopeSpans[0].Spans;
             Assert.AreEqual(1, spans.Count, "Unsupported telemetry types must be skipped, not crash the batch");
             Assert.AreEqual("RequestThatShouldSurvive", spans[0].Name);
             var opName = spans[0].Attributes.First(a => a.Key == "appinsights.operationname").Value.StringValue;
