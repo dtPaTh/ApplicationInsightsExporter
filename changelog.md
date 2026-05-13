@@ -3,8 +3,9 @@
 ## 1.2.0
 
 ### Changes
-- Updated OTLP proto to v1.10.0 (`InstrumentationLibrary*` types renamed to `ScopeSpans`/`InstrumentationScope`, namespace `Opentelemetry.*` → `OpenTelemetry.*`). Wire format binary-compatible.
-- Bumped `Google.Protobuf` and `Google.Protobuf.Tools` from `3.17.2` to `3.34.1`.
+- Retargeted forwarder to .NET 10. **Function App stack must be set to .NET 10 isolated before deploying.**
+- Updated OTLP proto to v1.10.0 (`InstrumentationLibrary*` → `ScopeSpans`/`InstrumentationScope`, namespace `Opentelemetry.*` → `OpenTelemetry.*`). Wire-compatible.
+- Bumped dependencies: `Google.Protobuf` 3.17.2 → 3.34.1, `Microsoft.Azure.Functions.Worker` 2.51.0 → 2.52.0, `Azure.Identity` 1.17.1 → 1.21.0.
 
 ## 1.1.1
 
