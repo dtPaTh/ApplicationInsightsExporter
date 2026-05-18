@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static Opentelemetry.Proto.Trace.V1.Span.Types;
+using static OpenTelemetry.Proto.Trace.V1.Span.Types;
 
 namespace OpenTelemetry
 {

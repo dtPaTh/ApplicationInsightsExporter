@@ -1,10 +1,9 @@
-﻿using Opentelemetry.Proto.Collector.Trace.V1;
-using System.IO;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
 using Google.Protobuf;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 
 namespace ApplicationInsights2OTLP
@@ -16,9 +15,9 @@ namespace ApplicationInsights2OTLP
 
         private static readonly MediaTypeHeaderValue ProtobufMediaTypeHeader = new MediaTypeHeaderValue(MediaContentType);
 
-        private readonly ExportTraceServiceRequest exportRequest;
+        private readonly IMessage exportRequest;
 
-        public ExportRequestContent(ExportTraceServiceRequest exportRequest)
+        public ExportRequestContent(IMessage exportRequest)
         {
             this.exportRequest = exportRequest;
             this.Headers.ContentType = ProtobufMediaTypeHeader;

@@ -6,7 +6,7 @@ namespace ApplicationInsights
 {
     internal static class SemanticConventions
     {
-        public const string InstrumentationLibraryName = "ApplicationInsights";
+        public const string InstrumentationScopeName = "ApplicationInsights";
 
         public const string ScopeAppInsights = "appinsights";
         public const string ScopeProperties = "prop";
@@ -21,6 +21,13 @@ namespace ApplicationInsights
         public const string Source = ScopeAppInsights + ".source";
         public const string Target = ScopeAppInsights + ".target";
         public const string ResultCode = ScopeAppInsights + ".resultcode";
+
+        public const string ScopeAppInsightsForwarder = "appinsightsforwarder";
+        public const string ForwarderUserAgent = ScopeAppInsightsForwarder + ".useragent";
+
+        // AppExceptions (AI-specific, not covered by standard OTel exception.*)
+        public const string ExceptionProblemId = ScopeAppInsights + ".exception.problem_id";
+        public const string ExceptionHandledAt = ScopeAppInsights + ".exception.handled_at";
 
         
 

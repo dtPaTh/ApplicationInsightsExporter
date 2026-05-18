@@ -9,7 +9,7 @@ namespace OpenTelemetry
     {
         
         public const string ResourceSpans = "resourceSpans";
-        public const string InstrumentationLibrarySpans = "instrumentationLibrarySpans";
+        public const string ScopeSpans = "scopeSpans";
         public const string Spans = "spans";
         public const string TraceId = "traceId";
         public const string SpanId = "spanId";

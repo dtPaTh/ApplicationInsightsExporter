@@ -349,3 +349,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /ApplicationInsightsForwarderWorker/local.settings.json
+
+# Visual Studio Connected Services / publish profile artifacts (per-developer)
+**/Properties/ServiceDependencies/
+**/Properties/serviceDependencies.*.json

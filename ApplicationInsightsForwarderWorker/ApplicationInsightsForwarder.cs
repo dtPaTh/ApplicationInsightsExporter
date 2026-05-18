@@ -8,6 +8,8 @@ namespace ApplicationInsightsForwarderWorker
 {
     public class ApplicationInsightsForwarder
     {
+        public const string HttpClientName = "ApplicationInsightsExporter";
+
         private readonly ILogger<ApplicationInsightsForwarder> _logger;
         private readonly ForwarderConfig _config;
         private readonly ApplicationInsights2OTLP.Convert _converter;
@@ -19,7 +21,7 @@ namespace ApplicationInsightsForwarderWorker
             _converter = otlpConverter;
             _config = config;
 
-            _httpClient = httpClientFactory.CreateClient("ApplicationInsightsExporter");
+            _httpClient = httpClientFactory.CreateClient(HttpClientName);
         }
 
         [Function("ForwardAI")]
@@ -33,16 +35,33 @@ namespace ApplicationInsightsForwarderWorker
                     byte[] msgBody = eventData.Body.ToArray();
                     messageBody = Encoding.UTF8.GetString(msgBody, 0, msgBody.Length);
 
-                    var exportTraceServiceRequest = _converter.FromApplicationInsights(messageBody);
-                    if (exportTraceServiceRequest == null) // if format was not able to be processed/mapped.. 
-                        continue;
+                    var (traceRequest, logsRequest) = _converter.FromApplicationInsights(messageBody);
 
-                    var content = new ApplicationInsights2OTLP.ExportRequestContent(exportTraceServiceRequest);
-
-                    var res = await _httpClient.PostAsync(_config.OTLPEndpoint, content);
-                    if (!res.IsSuccessStatusCode)
+                    if (traceRequest.ResourceSpans.Count > 0
+                        && traceRequest.ResourceSpans[0].ScopeSpans.Count > 0
+                        && traceRequest.ResourceSpans[0].ScopeSpans[0].Spans.Count > 0)
                     {
-                        _logger.LogError("Couldn't send spans. HTTP Status:  " + (res.StatusCode));
+                        var content = new ApplicationInsights2OTLP.ExportRequestContent(traceRequest);
+                        using var req = new HttpRequestMessage(HttpMethod.Post, _config.TracesEndpoint) { Content = content };
+                        if (!string.IsNullOrEmpty(_config.TracesAuthHeader))
+                            req.Headers.TryAddWithoutValidation("Authorization", _config.TracesAuthHeader);
+                        var res = await _httpClient.SendAsync(req);
+                        if (!res.IsSuccessStatusCode)
+                            _logger.LogError("Couldn't send spans. HTTP Status: " + res.StatusCode);
+                    }
+
+                    if (!string.IsNullOrEmpty(_config.LogsEndpoint)
+                        && logsRequest.ResourceLogs.Count > 0
+                        && logsRequest.ResourceLogs[0].ScopeLogs.Count > 0
+                        && logsRequest.ResourceLogs[0].ScopeLogs[0].LogRecords.Count > 0)
+                    {
+                        var content = new ApplicationInsights2OTLP.ExportRequestContent(logsRequest);
+                        using var req = new HttpRequestMessage(HttpMethod.Post, _config.LogsEndpoint) { Content = content };
+                        if (!string.IsNullOrEmpty(_config.LogsAuthHeader))
+                            req.Headers.TryAddWithoutValidation("Authorization", _config.LogsAuthHeader);
+                        var res = await _httpClient.SendAsync(req);
+                        if (!res.IsSuccessStatusCode)
+                            _logger.LogError("Couldn't send logs. HTTP Status: " + res.StatusCode);
                     }
                 }
                 catch (Exception ex)

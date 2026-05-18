@@ -1,0 +1,27 @@
+{
+    "records": [
+      {
+        "time": "2021-12-14T10:07:28.1437232Z",
+        "resourceId": "/SUBSCRIPTIONS/7dfdfDFA-86A1-46E8-B51D-609B547112AE/RESOURCEGROUPS/APPINSIGHTSTRACECONTEXTDEMO/PROVIDERS/MICROSOFT.INSIGHTS/COMPONENTS/TRACEDEMO",
+        "ResourceGUID": "eae5dd32-b4d5-4d7d-b693-e30c8f18f147",
+        "Type": "AppRequests",
+        "AppRoleInstance": "91aa43fb9caf19ffff0daa2775026caa42154d7f5bcb889a3513998ed2073fd5",
+        "AppRoleName": "apprequesttest",
+        "ClientType": "PC",
+        "IKey": "309effd4-0329-492a-bce4-da02ffc6e609",
+        "_BilledSize": 1063,
+        "OperationName": "AppRequestTest",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "ParentId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "SDKVersion": "azurefunctions: 3.3.1.0",
+        "Id": "95a7e634a629fd4f",
+        "Name": "FailedRequest",
+        "Url": "https://someservice.azurewebsites.net/api/Forward",
+        "Success": false,
+        "ResultCode": "500",
+        "DurationMs": 98.4657,
+        "PerformanceBucket": "<250ms",
+        "ItemCount": 1
+      }
+    ]
+}
