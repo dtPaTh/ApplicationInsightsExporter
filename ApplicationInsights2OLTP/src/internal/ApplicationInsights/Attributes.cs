@@ -24,8 +24,25 @@ namespace ApplicationInsights
         public const string HttpMethod = "HttpMethod";
         public const string HttpPath = "HttpPath";
         public const string ResultCode = "ResultCode";
+        public const string Success = "Success";
         public const string SDKVersion = "SDKVersion";
         public const string Target = "Target";
         public const string Source = "Source";
+
+        // AppTraces / AppExceptions
+        public const string Message = "Message";
+        public const string SeverityLevel = "SeverityLevel";
+
+        // AppExceptions
+        public const string ExceptionType = "ExceptionType";
+        public const string OuterMessage = "OuterMessage";
+        public const string ProblemId = "ProblemId";
+        public const string HandledAt = "HandledAt";
+        public const string Details = "Details";
+        public const string ParsedStack = "parsedStack";
+        public const string StackAssembly = "assembly";
+        public const string StackMethod = "method";
+        public const string StackFileName = "fileName";
+        public const string StackLine = "line";
     }
 }

@@ -21,15 +21,37 @@
         "Type": "AppExceptions",
         "AppRoleInstance": "instance-1",
         "AppRoleName": "mixedtest",
-        "OperationName": "ExceptionThatShouldBeSkipped",
+        "OperationName": "MixedException",
         "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
         "ParentId": "95a7e634a629fd4f",
         "SDKVersion": "azurefunctions: 3.3.1.0",
         "Id": "aaaaaaaaaaaaaaaa",
-        "Name": "ExceptionThatShouldBeSkipped",
         "ProblemId": "System.InvalidOperationException at Some.Method",
         "ExceptionType": "System.InvalidOperationException",
-        "OuterMessage": "boom"
+        "Message": "ExceptionMessageOnLogsSide",
+        "OuterMessage": "ExceptionMessageOnLogsSide",
+        "SeverityLevel": 3
+      },
+      {
+        "time": "2021-12-14T10:07:28.6000000Z",
+        "Type": "AppTraces",
+        "AppRoleInstance": "instance-1",
+        "AppRoleName": "mixedtest",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "ParentId": "95a7e634a629fd4f",
+        "SDKVersion": "azurefunctions: 3.3.1.0",
+        "Id": "bbbbbbbbbbbbbbbb",
+        "Message": "TraceMessageOnLogsSide",
+        "SeverityLevel": 2
+      },
+      {
+        "time": "2021-12-14T10:07:28.7000000Z",
+        "Type": "AppPageViews",
+        "AppRoleInstance": "instance-1",
+        "AppRoleName": "mixedtest",
+        "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+        "Id": "cccccccccccccccc",
+        "Name": "UnsupportedTypeShouldBeSkippedOnBothSides"
       }
     ]
 }

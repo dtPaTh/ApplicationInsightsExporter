@@ -1,0 +1,75 @@
+{
+    "records": [
+        {
+            "time": "2021-12-14T10:07:28.5000000Z",
+            "Type": "AppExceptions",
+            "AppRoleInstance": "instance-1",
+            "AppRoleName": "exceptiontest",
+            "_BilledSize": 1234,
+            "OperationName": "FailingOperation",
+            "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+            "ParentId": "95a7e634a629fd4f",
+            "SDKVersion": "azurefunctions: 3.3.1.0",
+            "Properties": {
+                "InvocationId": "f4399902-7c87-48ee-a0be-e659f6ea2d2d",
+                "Category": "Function.Failing",
+                "LogLevel": "Error",
+                "ProcessId": "6616",
+                "HostInstanceId": "b14a9f59-139f-45f9-8737-18a0c60bdae1"
+            },
+            "Id": "aaaaaaaaaaaaaaaa",
+            "ProblemId": "System.InvalidOperationException at Sample.Failing.Do",
+            "HandledAt": "UserCode",
+            "ExceptionType": "System.InvalidOperationException",
+            "Message": "Outer boom",
+            "OuterType": "System.InvalidOperationException",
+            "OuterMessage": "Outer boom",
+            "OuterAssembly": "Sample, Version=1.0.0.0",
+            "OuterMethod": "Sample.Failing.Do",
+            "InnermostType": "System.ArgumentNullException",
+            "InnermostMessage": "Value cannot be null. (Parameter 'name')",
+            "SeverityLevel": 3,
+            "Details": [
+                {
+                    "id": "1",
+                    "outerId": "0",
+                    "typeName": "System.InvalidOperationException",
+                    "message": "Outer boom",
+                    "hasFullStack": true,
+                    "parsedStack": [
+                        {
+                            "assembly": "Sample, Version=1.0.0.0",
+                            "method": "Sample.Failing.Do",
+                            "level": 0,
+                            "line": 42,
+                            "fileName": "/src/Failing.cs"
+                        },
+                        {
+                            "assembly": "Sample, Version=1.0.0.0",
+                            "method": "Sample.Failing.Run",
+                            "level": 1,
+                            "line": 17,
+                            "fileName": "/src/Failing.cs"
+                        }
+                    ]
+                },
+                {
+                    "id": "2",
+                    "outerId": "1",
+                    "typeName": "System.ArgumentNullException",
+                    "message": "Value cannot be null. (Parameter 'name')",
+                    "hasFullStack": true,
+                    "parsedStack": [
+                        {
+                            "assembly": "Sample, Version=1.0.0.0",
+                            "method": "Sample.Failing.Validate",
+                            "level": 0,
+                            "line": 8,
+                            "fileName": "/src/Failing.cs"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -8,5 +8,7 @@ namespace ApplicationInsights
     {
         public const string AppRequests = "AppRequests";
         public const string AppDependencies = "AppDependencies";
+        public const string AppExceptions = "AppExceptions";
+        public const string AppTraces = "AppTraces";
     }
 }

@@ -1,0 +1,25 @@
+{
+    "records": [
+        {
+            "time": "2021-12-14T10:07:28.6000000Z",
+            "Type": "AppTraces",
+            "AppRoleInstance": "instance-1",
+            "AppRoleName": "tracetest",
+            "_BilledSize": 256,
+            "OperationName": "RunningOperation",
+            "OperationId": "c0842e1a2e810d46bb62a1e3f81169bb",
+            "ParentId": "95a7e634a629fd4f",
+            "SDKVersion": "azurefunctions: 3.3.1.0",
+            "Properties": {
+                "InvocationId": "f4399902-7c87-48ee-a0be-e659f6ea2d2d",
+                "Category": "Function.Running",
+                "LogLevel": "Warning",
+                "ProcessId": "6616",
+                "HostInstanceId": "b14a9f59-139f-45f9-8737-18a0c60bdae1"
+            },
+            "Id": "bbbbbbbbbbbbbbbb",
+            "Message": "TraceMessageThatShouldSurvive",
+            "SeverityLevel": 2
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 # Application Insights Exporter for OpenTelemetry
 
-The Application Insights Exporter enables to read traces exported from Azure Application Insights and send it to an OpenTelemetry OTLP compatible endpoint. 
+The Application Insights Exporter enables to read traces and logs exported from Azure Application Insights and send them to an OpenTelemetry OTLP compatible endpoint.
 
 ### Original Trace in Application Insights
 ![](ai-trace.png)
@@ -11,12 +11,16 @@ The Application Insights Exporter enables to read traces exported from Azure App
 ## How does it work?
 The project comes with an Azure Function, bound to an EventHub from which it receives and then converts and forwards the telemetry. 
 
-Supported [Application Insights telemetry types](https://learn.microsoft.com/en-us/azure/azure-monitor/app/data-model) are: 
-* AppDependency
-* AppRequests
+Supported [Application Insights telemetry types](https://learn.microsoft.com/en-us/azure/azure-monitor/app/data-model) are:
+* AppDependencies → OTLP spans (client / producer)
+* AppRequests → OTLP spans (server)
+* AppExceptions → OTLP log records (severity `ERROR`, with OTel `exception.type` / `exception.message` / `exception.stacktrace` attributes)
+* AppTraces → OTLP log records (severity mapped from AppInsights `SeverityLevel`)
 
-Supported OpenTelemetry formats are: 
-* [OTLP/HTTP binary format](https://opentelemetry.io/docs/reference/specification/protocol/otlp/#binary-protobuf-encoding)
+Records of any other type in the same Event Hub batch are skipped without failing the batch.
+
+Supported OpenTelemetry formats are:
+* [OTLP/HTTP binary format](https://opentelemetry.io/docs/reference/specification/protocol/otlp/#binary-protobuf-encoding), traces sent to `/v1/traces` and logs to `/v1/logs`
 
 ## Getting Started
 
@@ -24,10 +28,10 @@ Supported OpenTelemetry formats are:
 * Create or configure an Azure EventHub to forward the telemetry from your Application Insights instance. 
 * If your target backend doesn't support OLTP/HTTP binary format, you can use an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) as a receiving endpoint for the Azure Function. 
 
-### Sending trace telemetry to EventHub
-Configure Diagnostic settings of your Application Insights instance from which you want to forward the telemtry. 
-* Check **Dependencies** and **Requests**  in the telemetry catgories (all other categories will be ignored when processing) 
-* Check the **Stream to an event hub** and select your previously configured eventhub. 
+### Sending telemetry to EventHub
+Configure Diagnostic settings of your Application Insights instance from which you want to forward the telemetry.
+* Check **Dependencies**, **Requests**, **Exceptions**, and **Traces** in the telemetry categories. Any other category in the batch is ignored.
+* Check the **Stream to an event hub** and select your previously configured eventhub.
 
 ![](ai-diagsettings.png)
 
@@ -42,14 +46,14 @@ Configure Diagnostic settings of your Application Insights instance from which y
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "EHConnection": "<YourEventHubConnectionString",
-    "OTLP_ENDPOINT": "http://localhost:4318/v1/traces"
+    "OTLP_ENDPOINT": "http://localhost:4318"
     /*,"OTLP_HEADER_AUTHORIZATION": "Api-Token XXXXX"*/
   }
 }
 ```
 * Replace the value of **EHConnection** with the connection string to read from your configured eventhub. Read more about here, [how to get an Event Hub connection string](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-get-connection-string). Make sure your connection string contains the configured EventHub name, provided via the additional component `EntityPath` which should look like this: `Endpoint=sb://<NamespaceName>.servicebus.windows.net/;SharedAccessKeyName=Listen;SharedAccessKey=<KeyName>;EntityPath=<EventHubName>`. 
-* Configure the **OTLP_ENDPOINT* to point to your targeted OLTP/HTTP binary compatible endpoint. By default it's a local endpoint configured for testing. 
-* Optionally configure **OTLP_HEADER_AUTHORIZATION**. If your OTLP endpoint requires authentication, you can set the **Authorization** http-header with this setting. 
+* Configure the **OTLP_ENDPOINT** to point to your targeted OTLP/HTTP binary compatible endpoint. When set to a bare base URL (e.g. `http://localhost:4318`), the forwarder automatically appends `/v1/traces` and `/v1/logs` and exports both signals. You can also set a full URL like `http://localhost:4318/v1/traces` — in that case only traces are exported (back-compat). For full control, use **OTLP_TRACES_ENDPOINT** and/or **OTLP_LOGS_ENDPOINT** to point each signal at a different target; either setting overrides the corresponding signal derived from `OTLP_ENDPOINT`.
+* Optionally configure **OTLP_HEADER_AUTHORIZATION**. If your OTLP endpoint requires authentication, you can set the **Authorization** http-header with this setting. The value is shared by both signals. If traces and logs target separate backends with different tokens, use **OTLP_TRACES_HEADER_AUTHORIZATION** and/or **OTLP_LOGS_HEADER_AUTHORIZATION** instead — either setting overrides `OTLP_HEADER_AUTHORIZATION` for its signal. 
 
 2. Run your Function
 
@@ -106,6 +110,10 @@ exporters:
 service:
   pipelines:
     traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [otlphttp]
+    logs:
       receivers: [otlp]
       processors: []
       exporters: [otlphttp]

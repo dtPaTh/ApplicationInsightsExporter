@@ -25,6 +25,10 @@ namespace ApplicationInsights
         public const string ScopeAppInsightsForwarder = "appinsightsforwarder";
         public const string ForwarderUserAgent = ScopeAppInsightsForwarder + ".useragent";
 
+        // AppExceptions (AI-specific, not covered by standard OTel exception.*)
+        public const string ExceptionProblemId = ScopeAppInsights + ".exception.problem_id";
+        public const string ExceptionHandledAt = ScopeAppInsights + ".exception.handled_at";
+
         
 
     }

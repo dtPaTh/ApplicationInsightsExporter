@@ -7,13 +7,9 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ForwarderConfig>();
 
-builder.Services.AddHttpClient("ApplicationInsightsExporter", config => {
-    config.DefaultRequestHeaders.UserAgent.ParseAdd(ForwarderInfo.UserAgent);
-
-    var authHeader = Environment.GetEnvironmentVariable("OTLP_HEADER_AUTHORIZATION");
-    if (!String.IsNullOrEmpty(authHeader))
-        config.DefaultRequestHeaders.Add("Authorization", authHeader);
-
+builder.Services.AddHttpClient(ApplicationInsightsForwarder.HttpClientName, client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd(ForwarderInfo.UserAgent);
 });
 
 builder.Services.AddSingleton<ApplicationInsights2OTLP.Convert>(sp =>
